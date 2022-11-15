@@ -180,7 +180,9 @@ def downld_data():
     year,month,date=loop1_date.split('-')
     month=month.upper()
     temp_zip_file_url = 'https://www1.nseindia.com/content/historical/EQUITIES/'+year+'/'+month+'/cm'+date+month+year+'bhav.csv.zip'
+    logger.info(temp_zip_file_url)
     r = requests.post(temp_zip_file_url)
+    logger.info("File with status code: "+str(r.status_code))
     z = zipfile.ZipFile(io.BytesIO(r.content))
     mtm = pd.read_csv(z.open(z.namelist()[0]))
     
