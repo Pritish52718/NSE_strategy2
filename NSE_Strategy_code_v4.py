@@ -250,7 +250,7 @@ with st.sidebar.header('Choose your input type'):
 st.sidebar.write('Your selected input type:', check_type)
 
 
-st.markdown('Latest Data date is: '+lis[-1].strftime("%d-%b-%Y"))
+st.markdown('Latest Data is of : '+lis[-1].strftime("%d-%b-%Y"))
 if check_type=='NSE_stocks':
     col1,col2,col3,col4,col5=st.columns([2,1.5,1.5,1.5,1.5])
     INSTRUMENT=col1.radio('Select Stock option or Index option',("OPTSTK","OPTIDX"))
