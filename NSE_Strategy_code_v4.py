@@ -257,7 +257,7 @@ st.sidebar.write('Your selected input type:', check_type)
 #     st.legacy_caching.clear_cache
 # #         st.experimental_memo.clear()
 # #         st. experimental_rerun()
-#st.markdown("Data till: "+lis[-1].strftime("%d-%b-%Y"))
+st.markdown("Data till: "+lis[-1].strftime("%d-%b-%Y"))
 if check_type=='NSE_stocks':
 #     if st.button('Download latest Data'):
 #         st.runtime.legacy_caching.clear_cache()
