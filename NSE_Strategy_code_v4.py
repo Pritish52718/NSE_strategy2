@@ -110,7 +110,7 @@ logger.setLevel(logging.INFO)
 
 
 #Populating today's date as default, if the stat_date and/or End_date is not provided.
-@st.cache
+@st.cache(ttl=18000)
 def downld_data():
     
     dfns=pd.DataFrame()
@@ -253,7 +253,7 @@ st.sidebar.write('Your selected input type:', check_type)
 
 
 
-#st.markdown("Data till: "+lis[-1].strftime("%d-%b-%Y"))
+st.markdown("Data till: "+lis[-1].strftime("%d-%b-%Y"))
 if check_type=='NSE_stocks':
     #st.markdown("Data till: "+lis[-1].strftime("%d-%b-%Y"))
     col1,col2,col3,col4,col5=st.columns([2,1.5,1.5,1.5,1.5])
