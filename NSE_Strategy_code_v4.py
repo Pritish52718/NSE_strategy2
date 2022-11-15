@@ -253,10 +253,10 @@ st.sidebar.write('Your selected input type:', check_type)
 
 
 ###changes start
-if st.button('Download latest Data'):
-    st.legacy_caching.clear_cache
-#         st.experimental_memo.clear()
-#         st. experimental_rerun()
+# if st.button('Download latest Data'):
+#     st.legacy_caching.clear_cache
+# #         st.experimental_memo.clear()
+# #         st. experimental_rerun()
 
 if check_type=='NSE_stocks':
     col1,col2,col3,col4,col5=st.columns([2,1.5,1.5,1.5,1.5])
