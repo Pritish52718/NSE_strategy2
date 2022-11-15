@@ -245,7 +245,7 @@ df_ns.rename(columns={"CLOSE_y":"EQ_price","CLOSE_x":"CLOSE"},inplace=True)
 
 
 with st.sidebar.header('Choose your input type'):
-    check_type = st.sidebar.selectbox('Select your input type here:',('NSE_filter','NSE_stocks'))
+    check_type = st.sidebar.selectbox('Select your input type here:',('NSE_stocks','NSE_filter'))
 
 st.sidebar.write('Your selected input type:', check_type)
 
