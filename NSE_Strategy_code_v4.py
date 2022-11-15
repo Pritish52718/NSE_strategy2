@@ -253,9 +253,9 @@ st.sidebar.write('Your selected input type:', check_type)
 
 
 
-st.markdown("Data till: "+lis[-1].strftime("%d-%b-%Y"))
+#st.markdown("Data till: "+lis[-1].strftime("%d-%b-%Y"))
 if check_type=='NSE_stocks':
-    
+    st.markdown("Data till: "+lis[-1].strftime("%d-%b-%Y"))
     col1,col2,col3,col4,col5=st.columns([2,1.5,1.5,1.5,1.5])
     INSTRUMENT=col1.radio('Select Stock option or Index option',("OPTSTK","OPTIDX"))
     
@@ -296,7 +296,7 @@ if check_type=='NSE_stocks':
 
 elif check_type=='NSE_filter':
     #st.session_state.co=co
-    
+    st.markdown("Data till: "+lis[-1].strftime("%d-%b-%Y"))
     col1,col2,col3,col4=st.columns([2,2,2,2])
 
 
