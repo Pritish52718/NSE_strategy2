@@ -261,9 +261,10 @@ st.sidebar.write('Your selected input type:', check_type)
 if check_type=='NSE_stocks':
 #     if st.button('Download latest Data'):
 #         st.runtime.legacy_caching.clear_cache()
+    st.subheader("Data till: "+lis[-1].strftime("%Y-%b-%d"))
     col1,col2,col3,col4,col5=st.columns([2,1.5,1.5,1.5,1.5])
     INSTRUMENT=col1.radio('Select Stock option or Index option',("OPTSTK","OPTIDX"))
-    col1.write("Data till: "+lis[-1].strftime("%Y-%b-%d"))
+    
     expiry=col5.date_input("Enter expiry date",nthu)
     expiry=expiry.strftime("%d-%b-%Y")
 
@@ -301,6 +302,7 @@ if check_type=='NSE_stocks':
 
 elif check_type=='NSE_filter':
     #st.session_state.co=co
+    st.subheader("Data till: "+lis[-1].strftime("%Y-%b-%d"))
     col1,col2,col3,col4=st.columns([2,2,2,2])
 #     if st.button('Reset',1):
 #         st.experimental_memo.clear()
