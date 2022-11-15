@@ -263,6 +263,7 @@ if check_type=='NSE_stocks':
 #         st.runtime.legacy_caching.clear_cache()
     col1,col2,col3,col4,col5=st.columns([2,1.5,1.5,1.5,1.5])
     INSTRUMENT=col1.radio('Select Stock option or Index option',("OPTSTK","OPTIDX"))
+    col1.write("Data till: "+lis[-1].strftime("%Y-%b-%d"))
     expiry=col5.date_input("Enter expiry date",nthu)
     expiry=expiry.strftime("%d-%b-%Y")
 
