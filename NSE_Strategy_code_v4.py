@@ -61,44 +61,6 @@ def rename_x(df,filename):
 
 
 
-#@st.cache
-def read_data(df,df_ns,df_nf,filename):
-    df=get_df(df)
-    df_nf=pd.merge(df,df_nf,on=['SYMBOL', 'EXPIRY_DT', 'STRIKE_PR', 'OPTION_TYP'],how='left')
-    drop_y(df_nf,filename)
-    df_ns=pd.concat([df,df_ns],ignore_index=True,axis=0)
-    return df_nf,df_ns
-    #print(i)
-    
-    
-
-
-
-def req(zip_file_url,df_ns,df_nf):
-    global No_of_download
-    r = requests.post(zip_file_url)
-    status_code=r.status_code
-        
-    #print(status_code)
-    #If status code is <> 200, it indicates that no data is present for that date. For example, week-end, or trading holiday.
-    if status_code==200:
-        No_of_download=No_of_download+1
-        logger.info("File Available.Downloading")
-        z = zipfile.ZipFile(io.BytesIO(r.content))
-        #z.extractall(path=path)
-        df = pd.read_csv(z.open(z.namelist()[0]))
-        print(df.columns)
-        if (df_nf.empty) & (df_ns.empty):
-            df_nf=get_df(df)
-            df_ns=get_df(df)
-        else:
-            df_nf,df_ns=read_data(df,df_ns,df_nf,z.namelist()[0])
-    else:
-        logger.info("******File Not Available.Moving to next date.")
-    return status_code,df_nf,df_ns
-    
-
-
 
 
 
