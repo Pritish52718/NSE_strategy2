@@ -72,7 +72,7 @@ logger.setLevel(logging.INFO)
 
 
 #Populating today's date as default, if the stat_date and/or End_date is not provided.
-@st.cache(ttl=21600)
+#@st.cache(ttl=21600)
 def downld_data():
     
     dfns=pd.DataFrame()
