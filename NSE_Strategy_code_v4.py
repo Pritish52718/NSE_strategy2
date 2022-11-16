@@ -164,6 +164,9 @@ def downld_data():
                     dfnf=pd.merge(df,dfnf,on=['SYMBOL', 'EXPIRY_DT', 'STRIKE_PR', 'OPTION_TYP'],how='left')
                     ext=lis[-2].strftime('%d%b').upper()
                     drop_y(dfnf,ext)
+            else:
+                logger.info("******File Not Available.Moving to next date.")
+                
 
 #     dfnf=dfnf.rename(columns={'LOW':'LOW_'+first_file[2:7],'CONTRACTS':'CONTRACTS_'+first_file[2:7],'OPEN':'OPEN_'+first_file[2:7],
 #                              'HIGH':'HIGH_'+first_file[2:7],'CLOSE':'CLOSE_'+first_file[2:7],'OPEN_INT':'OPEN_INT_'+first_file[2:7]})
