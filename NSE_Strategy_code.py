@@ -302,13 +302,13 @@ elif check_type=='NSE_filter':
 
     INSTRUMENT=col1.radio('Select Stock option or Index option',("OPTSTK","OPTIDX"))
 
-    co=int(col4.radio('1-Day or 2-Days decreasing Contracts',(2,1),key='radio_option'))
+    co=int(col4.radio('1-Day or 2-Days decreasing Contracts',(2,1,"None"),key='radio_option'))
     #st.write(st.session_state.radio_option)
 
 
 
-    min_inv=int(col2.radio('Enter minimum Investments',(1000,3000,5000,10000)))
-    max_inv=int(col3.radio('Enter maximum Investments',(10000,5000,3000,)))
+    min_inv=int(col2.text_input('Enter minimum Investments',1000))
+    max_inv=int(col3.text_input('Enter maximum Investments',10000))
 
     col1,buff,col2,col3=st.columns([2,2,2,2])
     close_price=col1.text_input('Minumum price',4)
@@ -355,8 +355,10 @@ elif check_type=='NSE_filter':
     #Add butooon **************************************
     if co==1:
         df4=df2[(df2["CONTRACTS"]<df2[yest_con_name])]
-    else:
+    elif co==2:
         df4=df2[(df2["CONTRACTS"]<df2[yest_con_name])&(df2[yest_con_name]<df2[daybef_con_name])]
+    else:
+        df4=df2
 
 
     today_OI_name="OPEN_INT"
