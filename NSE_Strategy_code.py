@@ -302,7 +302,7 @@ elif check_type=='NSE_filter':
 
     INSTRUMENT=col1.radio('Select Stock option or Index option',("OPTSTK","OPTIDX"))
 
-    co=int(col4.radio('1-Day or 2-Days decreasing Contracts',(2,1,"None"),key='radio_option'))
+    co=str(col4.radio('1-Day or 2-Days decreasing Contracts',(2,1,"None"),key='radio_option'))
     #st.write(st.session_state.radio_option)
 
 
@@ -353,9 +353,9 @@ elif check_type=='NSE_filter':
 
     #print(yest_con_name)
     #Add butooon **************************************
-    if co==1:
+    if co=="1":
         df4=df2[(df2["CONTRACTS"]<df2[yest_con_name])]
-    elif co==2:
+    elif co=="2":
         df4=df2[(df2["CONTRACTS"]<df2[yest_con_name])&(df2[yest_con_name]<df2[daybef_con_name])]
     else:
         df4=df2
