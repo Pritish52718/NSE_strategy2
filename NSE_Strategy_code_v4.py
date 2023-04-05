@@ -255,8 +255,13 @@ if check_type=='NSE_stocks':
         dfx=df1.style.highlight_max(axis=0, props='background-color:lightgreen', subset=['HIGH']).highlight_min(axis=0, color="pink",subset=['LOW']).set_precision(2)
 
         st.dataframe(dfx)
-        st.write("Following dates are skipped (Might be holiday or error), Please check: ",skip_dates)
+        s = ''
+        st.write("Following dates are skipped (Might be holiday or error), Please check: ")
+        for i in skip_dates:
+            s += "- " + i + "\n"
 
+        st.markdown(s)
+        
 
     else:
         st.subheader('Please enter all inputs')
@@ -370,7 +375,12 @@ elif check_type=='NSE_filter':
            'OPEN', 'HIGH', 'LOW', 'CLOSE', 'OPEN_INT','CONTRACTS','EQ_price', 'Lot_size', 'Investment']]
 
     st.dataframe(df11.style.set_precision(2))
-    st.write("Following dates are skipped (Might be holiday or error), Please check: ",skip_dates)
+    s = ''
+    st.write("Following dates are skipped (Might be holiday or error), Please check: ")
+    for i in skip_dates:
+        s += "- " + i + "\n"
+
+    st.markdown(s)
 
     reports_csv=df11.to_csv().encode('utf-8')
     st.download_button(label="Export Report",data=reports_csv,file_name='Report.csv',mime='text/csv')
