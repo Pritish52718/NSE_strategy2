@@ -93,7 +93,7 @@ def downld_data():
             End_date=today_date
 
     daterange = pd.date_range(datetime.strptime(Start_date, "%Y%b%d"),datetime.strptime(End_date, "%Y%b%d"))
-    lis=[]
+    lis,skip_dates=[],[]
     #Looping through each date, and downloading the file.
     for single_date in daterange:
         loop_date=single_date.strftime("%Y-%b-%d")
@@ -108,7 +108,11 @@ def downld_data():
             logger.info(temp_zip_file_url)
             #ls,df_ns,df_nf=req(temp_zip_file_url,df_ns,df_nf)
             #r = requests.post(temp_zip_file_url)
-            r = requests.Session().get(temp_zip_file_url)#,verify=False)
+            try:
+                r = requests.Session().get(temp_zip_file_url,timeout=5)#,verify=False)
+            except:
+                skip_dates.append(single_date)
+                continue;
             logger.info(r.status_code)
             status_code=r.status_code
             if status_code==200:
@@ -164,13 +168,13 @@ def downld_data():
     
     lot_size=pd.read_csv('fo_mktlots.csv')
 
-    return(lis,dfns,dfnf,lot_size,mtm)
+    return(lis,dfns,dfnf,lot_size,mtm,skip_dates)
 
 
 # In[ ]:
 
     
-lis,dfns,dfnf,lot_size,mtm1=downld_data()
+lis,dfns,dfnf,lot_size,mtm1,skip_dates=downld_data()
 df_nf=copy.deepcopy(dfnf)
 df_ns=copy.deepcopy(dfns)
 mtm=copy.deepcopy(mtm1)
@@ -251,6 +255,7 @@ if check_type=='NSE_stocks':
         dfx=df1.style.highlight_max(axis=0, props='background-color:lightgreen', subset=['HIGH']).highlight_min(axis=0, color="pink",subset=['LOW']).set_precision(2)
 
         st.dataframe(dfx)
+        st.write("Following dates are skipped (Might be holiday or error), Please check: ",skip_dates)
 
 
     else:
@@ -365,6 +370,7 @@ elif check_type=='NSE_filter':
            'OPEN', 'HIGH', 'LOW', 'CLOSE', 'OPEN_INT','CONTRACTS','EQ_price', 'Lot_size', 'Investment']]
 
     st.dataframe(df11.style.set_precision(2))
+    st.write("Following dates are skipped (Might be holiday or error), Please check: ",skip_dates)
 
     reports_csv=df11.to_csv().encode('utf-8')
     st.download_button(label="Export Report",data=reports_csv,file_name='Report.csv',mime='text/csv')
