@@ -111,7 +111,7 @@ def downld_data():
             try:
                 r = requests.Session().get(temp_zip_file_url,timeout=5)#,verify=False)
             except:
-                skip_dates.append(single_date)
+                skip_dates.append(loop_date)
                 continue;
             logger.info(r.status_code)
             status_code=r.status_code
