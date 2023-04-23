@@ -83,7 +83,7 @@ def downld_data():
         if weekday not in [5,6]:
             Working_day=Working_day+1
             logger.info("Trying to download File of :"+loop_date)
-            temp_zip_file_url = 'https://archives.nseindia.com/content/historical/DERIVATIVES/'+year+'/'+month+'/fo'+date+month+year+'bhav.csv.zip'
+            temp_zip_file_url = 'https://archives.nseindia.com/content/historical/EQUITIES/'+year+'/'+month+'/cm'+date+month+year+'bhav.csv.zip'
             print(temp_zip_file_url)
             #ls,df_ns,df_nf=req(temp_zip_file_url,df_ns,df_nf)
             r = requests.post(temp_zip_file_url)
