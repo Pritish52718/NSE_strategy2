@@ -75,7 +75,7 @@ def downld_data():
     single_date=Start_date
     while count<90:
         count+=1
-        if count>150:
+        if count>200:
             break;
         single_date=single_date-timedelta(days=1)
         loop_date=single_date.strftime("%Y-%b-%d")
