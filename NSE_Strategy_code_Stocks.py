@@ -8,7 +8,7 @@ from datetime import datetime,date,timedelta
 
 from dateutil.relativedelta import relativedelta, TH
 
-#st.set_page_config(layout="wide")
+st.set_page_config(layout="wide")
 
 
 def get_df(df):
