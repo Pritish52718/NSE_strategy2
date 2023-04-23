@@ -74,9 +74,12 @@ def downld_data():
     #Looping through each date, and downloading the file.
     single_date=Start_date
     while count<90:
-        count+=1
-        if count>200:
+        
+        ### for infite loop
+        count2+=1
+        if count2>200:
             break;
+         
         single_date=single_date-timedelta(days=1)
         loop_date=single_date.strftime("%Y-%b-%d")
         year,month,date=loop_date.split('-')
