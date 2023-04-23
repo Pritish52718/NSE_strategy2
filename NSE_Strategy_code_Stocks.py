@@ -67,13 +67,16 @@ def downld_data():
     Non_Work_day=0
     Start_date=(datetime.now()+timedelta(days=1))
     check=True
-    count=0
+    count,count2=0,0
 
     
     lis=[]
     #Looping through each date, and downloading the file.
     single_date=Start_date
     while count<90:
+        count+=1
+        if count>150:
+            break;
         single_date=single_date-timedelta(days=1)
         loop_date=single_date.strftime("%Y-%b-%d")
         year,month,date=loop_date.split('-')
