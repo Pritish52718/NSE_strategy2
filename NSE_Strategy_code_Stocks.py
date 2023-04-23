@@ -86,11 +86,11 @@ def downld_data():
             temp_zip_file_url = 'https://archives.nseindia.com/content/historical/EQUITIES/'+year+'/'+month+'/cm'+date+month+year+'bhav.csv.zip'
             
             try:
-                r = requests.Session().get(temp_zip_file_url,timeout=1.5,verify=False)
+                r = requests.Session().get(temp_zip_file_url,timeout=5,verify=False)
             except:                
                 logger.info("File not Available. Skipping....")
                 continue;
-                
+            
             status_code=r.status_code
             if status_code==200:
                 count+=1
@@ -123,7 +123,7 @@ def downld_data():
     logger.info("No. of weekdays in the given time span="+str(Working_day)) 
     logger.info("****************************************************************************************") 
     logging.shutdown()
-    print(first_file)
+    #print(first_file)
 
     return(lis,dfns,dfnf)
 
@@ -183,6 +183,7 @@ elif check_type=='NSE_filter':
     
    
     lows=df_nf.columns[df_nf.columns.str.contains('LOW')]
+    print(lows)
     
     df_nf=df_nf[df_nf.LOW==df_nf[lows].min(axis=1)]
     df4=df_nf
