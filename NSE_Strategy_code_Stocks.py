@@ -92,7 +92,7 @@ def downld_data():
             temp_zip_file_url = 'https://archives.nseindia.com/content/historical/EQUITIES/'+year+'/'+month+'/cm'+date+month+year+'bhav.csv.zip'
             
             try:
-                r = requests.Session().get(temp_zip_file_url,timeout=1.5)
+                r = requests.Session().get(temp_zip_file_url,timeout=5)
             except:                
                 logger.info("File not Available. Skipping....")
                 continue;
