@@ -84,9 +84,13 @@ def downld_data():
             Working_day=Working_day+1
             logger.info("Trying to download File of :"+loop_date)
             temp_zip_file_url = 'https://archives.nseindia.com/content/historical/EQUITIES/'+year+'/'+month+'/cm'+date+month+year+'bhav.csv.zip'
-            print(temp_zip_file_url)
-            #ls,df_ns,df_nf=req(temp_zip_file_url,df_ns,df_nf)
-            r = requests.post(temp_zip_file_url)
+            
+            try:
+                r = requests.Session().get(temp_zip_file_url,timeout=1.5,verify=False)
+            except:                
+                logger.info("File not Available. Skipping....")
+                continue;
+                
             status_code=r.status_code
             if status_code==200:
                 count+=1
