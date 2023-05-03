@@ -8,7 +8,7 @@ from datetime import datetime,date,timedelta
 
 from dateutil.relativedelta import relativedelta, TH
 
-st.set_page_config(layout="wide")
+#st.set_page_config(layout="wide")
 
 
 def get_df(df):
@@ -67,19 +67,13 @@ def downld_data():
     Non_Work_day=0
     Start_date=(datetime.now()+timedelta(days=1))
     check=True
-    count,count2=0,0
+    count=0
 
     
     lis=[]
     #Looping through each date, and downloading the file.
     single_date=Start_date
     while count<90:
-        
-        ### for infite loop
-        count2+=1
-        if count2>200:
-            break;
-         
         single_date=single_date-timedelta(days=1)
         loop_date=single_date.strftime("%Y-%b-%d")
         year,month,date=loop_date.split('-')
@@ -92,7 +86,7 @@ def downld_data():
             temp_zip_file_url = 'https://archives.nseindia.com/content/historical/EQUITIES/'+year+'/'+month+'/cm'+date+month+year+'bhav.csv.zip'
             
             try:
-                r = requests.Session().get(temp_zip_file_url,timeout=5)
+                r = requests.Session().get(temp_zip_file_url,timeout=5,verify=False)
             except:                
                 logger.info("File not Available. Skipping....")
                 continue;
