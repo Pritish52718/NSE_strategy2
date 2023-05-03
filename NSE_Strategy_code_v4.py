@@ -72,7 +72,7 @@ logger.setLevel(logging.INFO)
 
 
 #Populating today's date as default, if the stat_date and/or End_date is not provided.
-@st.cache(ttl=21600)
+@st.cache_data(ttl=21600)
 def downld_data():
     
     dfns=pd.DataFrame()
@@ -252,7 +252,7 @@ if check_type=='NSE_stocks':
         df1.TIMESTAMP=pd.to_datetime(df1.TIMESTAMP)
         df1=df1.sort_values("TIMESTAMP",ascending=False).reset_index(drop=True)
         df1.drop("INSTRUMENT", axis=1, inplace=True)
-        dfx=df1.style.highlight_max(axis=0, props='background-color:lightgreen', subset=['HIGH']).highlight_min(axis=0, color="pink",subset=['LOW']).set_precision(2)
+        dfx=df1.style.highlight_max(axis=0, props='background-color:lightgreen', subset=['HIGH']).highlight_min(axis=0, color="pink",subset=['LOW']).format(precision=2)
 
         st.dataframe(dfx)
         s = ''
@@ -374,7 +374,7 @@ elif check_type=='NSE_filter':
     df11=df11[['SYMBOL', 'EXPIRY_DT', 'STRIKE_PR', 'OPTION_TYP',
            'OPEN', 'HIGH', 'LOW', 'CLOSE', 'OPEN_INT','CONTRACTS','EQ_price', 'Lot_size', 'Investment']]
 
-    st.dataframe(df11.style.set_precision(2))
+    st.dataframe(df11.style.format(precision=2))
     s = ''
     st.write("Following dates are skipped (Might be holiday or error), Please check: ")
     for i in skip_dates:
