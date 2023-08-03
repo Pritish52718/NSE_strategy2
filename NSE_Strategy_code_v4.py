@@ -30,8 +30,6 @@ def get_df(df):
     #df = pd.read_csv(d_path+'/'+name)
     df.columns = df.columns.str.strip()
     df = df.applymap(lambda x: x.strip() if type(x)==str else x)
-#     df = df[df.INSTRUMENT==INSTRUMENT]
-#     df = df[df.EXPIRY_DT==expiry]
     df=df[['TIMESTAMP','INSTRUMENT','SYMBOL', 'EXPIRY_DT', 'STRIKE_PR', 'OPTION_TYP',
            'OPEN', 'HIGH', 'LOW', 'CLOSE', 'OPEN_INT', 'CONTRACTS']]
     df.reset_index(drop=True,inplace=True)
