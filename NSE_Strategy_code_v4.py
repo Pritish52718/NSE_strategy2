@@ -275,7 +275,7 @@ elif check_type=='NSE_filter':
 
     INSTRUMENT=col1.radio('Select Stock option or Index option',("OPTSTK","OPTIDX"))
 
-    co=int(col4.radio('1-Day or 2-Days decreasing Contracts',(5,4,3,2,1),key='radio_option'))
+    co=int(col4.radio('1-Day or 2-Days decreasing Contracts',(2,1),key='radio_option'))
     # co=int(col4.selectbox('1-Day or 2-Days decreasing Contracts',(5,4,3,2,1))
     #st.write(st.session_state.radio_option)
 
