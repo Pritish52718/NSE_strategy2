@@ -275,12 +275,13 @@ elif check_type=='NSE_filter':
 
     INSTRUMENT=col1.radio('Select Stock option or Index option',("OPTSTK","OPTIDX"))
 
-    co=int(col4.radio('1-Day or 2-Days decreasing Contracts',(2,1),key='radio_option'))
+    co=int(col4.radio('1-Day or 2-Days decreasing Contracts',(5,4,3,2,1),key='radio_option'))
+    # co=int(col4.selectbox('1-Day or 2-Days decreasing Contracts',(5,4,3,2,1))
     #st.write(st.session_state.radio_option)
 
 
 
-    min_inv=int(col2.radio('Enter minimum Investments',(1000,3000,5000,10000)))
+    min_inv=int(col2.radio('Enter minimum Investments',(1000,3000,5000,10000,50000)))
     max_inv=int(col3.radio('Enter maximum Investments',(10000,5000,3000,)))
 
     col1,buff,col2,col3=st.columns([2,2,2,2])
