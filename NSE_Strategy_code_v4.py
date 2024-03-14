@@ -315,8 +315,8 @@ elif check_type=='NSE_filter':
     df_nf=df_nf[df_nf.LOW==df_nf[lows].min(axis=1)]
 
     if INSTRUMENT=='OPTSTK':
-        df_ce=df_nf[(df_nf.OPTION_TYP=='CE')&(df_nf.STRIKE_PR>df_nf.EQ_price)]
-        df_pe=df_nf[(df_nf.OPTION_TYP=='PE')&(df_nf.STRIKE_PR<df_nf.EQ_price)]
+        df_ce=df_nf[(df_nf.OPTION_TYP=='CE')]#&(df_nf.STRIKE_PR>df_nf.EQ_price)]
+        df_pe=df_nf[(df_nf.OPTION_TYP=='PE')]#&(df_nf.STRIKE_PR<df_nf.EQ_price)]
         df2=pd.concat([df_ce, df_pe], ignore_index=True, axis=0)
     else:
         df2=df_nf
@@ -353,15 +353,15 @@ elif check_type=='NSE_filter':
     else:
         df10=df4[(df4.Investment>min_inv)&(df4.Investment<=max_inv)].reset_index(drop=True)
 
-    df_ce1=df10[df10.OPTION_TYP=='CE'].drop_duplicates(subset=['SYMBOL','OPTION_TYP'],keep='first',ignore_index=True)
-    df_pe1=df10[df10.OPTION_TYP=='PE'].drop_duplicates(subset=['SYMBOL','OPTION_TYP'],keep='last',ignore_index=True)
-    df11=pd.concat([df_ce1, df_pe1], ignore_index=True, axis=0)
+    # df_ce1=df10[df10.OPTION_TYP=='CE'].drop_duplicates(subset=['SYMBOL','OPTION_TYP'],keep='first',ignore_index=True)
+    # df_pe1=df10[df10.OPTION_TYP=='PE'].drop_duplicates(subset=['SYMBOL','OPTION_TYP'],keep='last',ignore_index=True)
+    # df11=pd.concat([df_ce1, df_pe1], ignore_index=True, axis=0)
 
 
 
 
     #style.highlight_max(axis=0)
-    df11=df11[['SYMBOL', 'EXPIRY_DT', 'STRIKE_PR', 'OPTION_TYP',
+    df11=df10[['SYMBOL', 'EXPIRY_DT', 'STRIKE_PR', 'OPTION_TYP',
            'OPEN', 'HIGH', 'LOW', 'CLOSE', 'OPEN_INT','CONTRACTS','EQ_price', 'Lot_size', 'Investment']]
 
     st.dataframe(df11.style.format(precision=2))
