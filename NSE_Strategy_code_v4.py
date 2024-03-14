@@ -329,7 +329,7 @@ elif check_type=='NSE_filter':
 
 
 
-    df4=df4.merge(lot_size,on='SYMBOL',how="left")
+    df4=df2.merge(lot_size,on='SYMBOL',how="left")
     df4.rename(columns={'JAN-23':'Lot_size'},inplace=True)
     #df4.Lot_size=df4.Lot_size.astype('int64')
     df4['Investment']=df4['HIGH']*df4['Lot_size']
