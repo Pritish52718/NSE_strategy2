@@ -14,7 +14,7 @@ import shutil
 import copy
 import os
 from datetime import datetime,date,timedelta
-
+import pytz
 from dateutil.relativedelta import relativedelta, TH
 
 st.set_page_config(layout="wide")
@@ -218,7 +218,7 @@ if st.sidebar.button("Refresh with Latest Data"):
 with st.sidebar.header('Choose your input type'):
     check_type = st.sidebar.radio('Select your input type here:',('NSE_filter','NSE_stocks'))
 
-    
+time_dt=time_dt.astimezone(pytz.timezone('Asia/Kolkata'))
 st.sidebar.write("Last refresh time: ",time_dt.strftime('%Y-%m-%d %H:%M'))
 next_time=time_dt+timedelta(hours=6)
 st.sidebar.write("Next refresh at: ",next_time.strftime('%Y-%m-%d %H:%M'))
