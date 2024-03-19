@@ -219,9 +219,9 @@ with st.sidebar.header('Choose your input type'):
     check_type = st.sidebar.radio('Select your input type here:',('NSE_filter','NSE_stocks'))
 
 time_dt=time_dt.astimezone(pytz.timezone('Asia/Kolkata'))
-st.sidebar.write("Last refresh time: ",time_dt.strftime('%Y-%m-%d %H:%M'))
+st.sidebar.write("Last refresh time: ",time_dt.strftime('%d-%b-%Y %I:%M %p'))
 next_time=time_dt+timedelta(hours=6)
-st.sidebar.write("Next refresh at: ",next_time.strftime('%Y-%m-%d %H:%M'))
+st.sidebar.write("Next refresh at: ",next_time.strftime('%d-%b-%Y %I:%M %p'))
 
 
 
