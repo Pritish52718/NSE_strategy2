@@ -166,13 +166,13 @@ def downld_data():
     
     lot_size=pd.read_csv('fo_mktlots.csv')
 
-    return(lis,dfns,dfnf,lot_size,mtm,skip_dates)
+    return(lis,dfns,dfnf,lot_size,mtm,skip_dates,datetime.now())
 
 
 # In[ ]:
 
     
-lis,dfns,dfnf,lot_size,mtm1,skip_dates=downld_data()
+lis,dfns,dfnf,lot_size,mtm1,skip_dates,time_dt=downld_data()
 df_nf=copy.deepcopy(dfnf)
 df_ns=copy.deepcopy(dfns)
 mtm=copy.deepcopy(mtm1)
@@ -211,12 +211,17 @@ df_ns=pd.merge(df_ns,mtm[['SYMBOL','CLOSE']],on="SYMBOL",how="left")
 df_ns.rename(columns={"CLOSE_y":"EQ_price","CLOSE_x":"CLOSE"},inplace=True)
 
 
-
-
+if st.sidebar.button("Refresh with Latest Data"):
+    st.cache_data.clear()
+    st.experimental_rerun()
+    
 with st.sidebar.header('Choose your input type'):
-    check_type = st.sidebar.selectbox('Select your input type here:',('NSE_filter','NSE_stocks'))
+    check_type = st.sidebar.radio('Select your input type here:',('NSE_filter','NSE_stocks'))
 
-st.sidebar.write('Your selected input type:', check_type)
+    
+st.sidebar.write("Last refresh time: ",time_dt.strftime('%Y-%m-%d %H:%M'))
+next_time=time_dt+timedelta(hours=6)
+st.sidebar.write("Next refresh at: ",next_time.strftime('%Y-%m-%d %H:%M'))
 
 
 
