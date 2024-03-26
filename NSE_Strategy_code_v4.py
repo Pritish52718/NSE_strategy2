@@ -231,14 +231,14 @@ if check_type=='NSE_stocks':
     #st.markdown("Data till: "+lis[-1].strftime("%d-%b-%Y"))
     col1,col2,col3,col4,col5=st.columns([2,1.5,1.5,1.5,1.5])
     INSTRUMENT=col1.radio('Select Stock option or Index option',("OPTSTK","OPTIDX"))
-    exp_dates=sorted(pd.to_datetime(df_nf[df_nf.INSTRUMENT==INSTRUMENT].EXPIRY_DT.unique()))
+    exp_dates=sorted(pd.to_datetime(df_ns[df_ns.INSTRUMENT==INSTRUMENT].EXPIRY_DT.unique()))
     exp_date=exp_dates[0]
     
     expiry=col5.date_input("Enter expiry date",exp_date)
     expiry=expiry.strftime("%d-%b-%Y")
 
     df_ns=df_ns[df_ns.INSTRUMENT==INSTRUMENT]
-    if expiry not in df_nf.EXPIRY_DT.values:
+    if expiry not in df_ns.EXPIRY_DT.values:
         st.write('Please select correct expiry among: ')
         lst_exp=[i.strftime("%d-%b-%Y") for i in exp_dates if i.month==datetime.today().month ]
         s = ''
