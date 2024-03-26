@@ -12,6 +12,7 @@ import streamlit as st
 import requests, zipfile, io,logging
 import shutil
 import copy
+import sys
 import os
 from datetime import datetime,date,timedelta
 import pytz
@@ -230,12 +231,23 @@ if check_type=='NSE_stocks':
     #st.markdown("Data till: "+lis[-1].strftime("%d-%b-%Y"))
     col1,col2,col3,col4,col5=st.columns([2,1.5,1.5,1.5,1.5])
     INSTRUMENT=col1.radio('Select Stock option or Index option',("OPTSTK","OPTIDX"))
+    exp_dates=sorted(pd.to_datetime(df_nf[df_nf.INSTRUMENT==INSTRUMENT].EXPIRY_DT.unique()))
+    exp_date=exp_dates[0]
     
-    expiry=col5.date_input("Enter expiry date",nthu)
+    expiry=col5.date_input("Enter expiry date",exp_date)
     expiry=expiry.strftime("%d-%b-%Y")
 
     df_ns=df_ns[df_ns.INSTRUMENT==INSTRUMENT]
-    df_ns=df_ns[df_ns.EXPIRY_DT==expiry]
+    if expiry not in df_nf.EXPIRY_DT.values:
+        st.write('Please select correct expiry among: ')
+        lst_exp=[i.strftime("%d-%b-%Y") for i in exp_dates if i.month==datetime.today().month ]
+        s = ''
+        for i in lst_exp:
+            s += "- " + i + "\n"
+        st.markdown(s)
+        sys.exit()
+    else:
+        df_ns=df_ns[df_ns.EXPIRY_DT==expiry]
 
     l=list(df_ns.SYMBOL)
     if INSTRUMENT=="OPTIDX":
@@ -279,6 +291,8 @@ elif check_type=='NSE_filter':
 
 
     INSTRUMENT=col1.radio('Select Stock option or Index option',("OPTSTK","OPTIDX"))
+    exp_dates=sorted(pd.to_datetime(df_nf[df_nf.INSTRUMENT==INSTRUMENT].EXPIRY_DT.unique()))
+    exp_date=exp_dates[0]
 
     # co=int(col4.radio('1-Day or 2-Days decreasing Contracts',(2,1),key='radio_option'))
     co=int(col4.selectbox('1-5 Days decreasing Contracts',(5,4,3,2,1),index=3))
@@ -293,12 +307,21 @@ elif check_type=='NSE_filter':
     close_price=col1.text_input('Minumum price',4)
     contr=col2.text_input('Minumum contracts',200)
     op_int=buff.text_input('Minimum OPEN INTEREST',100000)
-    expiry=col3.date_input("Enter expiry date",nthu)
+    expiry=col3.date_input("Enter expiry date",exp_date)
     expiry=expiry.strftime("%d-%b-%Y")
 
 
     df_nf=df_nf[df_nf.INSTRUMENT==INSTRUMENT]
-    df_nf=df_nf[df_nf.EXPIRY_DT==expiry]
+    if expiry not in df_nf.EXPIRY_DT.values:
+        st.write('Please select correct expiry among: ')
+        lst_exp=[i.strftime("%d-%b-%Y") for i in exp_dates if i.month==datetime.today().month ]
+        s = ''
+        for i in lst_exp:
+            s += "- " + i + "\n"
+        st.markdown(s)
+        sys.exit()
+    else:
+        df_nf=df_nf[df_nf.EXPIRY_DT==expiry]
 
 
 
