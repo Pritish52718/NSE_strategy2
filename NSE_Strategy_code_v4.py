@@ -393,12 +393,13 @@ elif check_type=='NSE_filter':
            'OPEN', 'HIGH', 'LOW', 'CLOSE', 'OPEN_INT','CONTRACTS','EQ_price', 'Lot_size', 'Investment']]
 
     st.dataframe(df11.style.format(precision=2))
-    s = ''
-    st.write("Following dates are skipped (Might be holiday or error), Please check: ")
-    for i in skip_dates:
-        s += "- " + i + "\n"
-
-    st.markdown(s)
+    if skip_dates:
+        s = ''
+        st.write("Following dates are skipped (Might be holiday or error), Please check: ")
+        for i in skip_dates:
+            s += "- " + i + "\n"
+    
+        st.markdown(s)
 
     reports_csv=df11.to_csv().encode('utf-8')
     st.download_button(label="Export Report",data=reports_csv,file_name='Report.csv',mime='text/csv')
