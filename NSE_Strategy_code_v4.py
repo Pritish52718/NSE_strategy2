@@ -246,8 +246,8 @@ if check_type=='NSE_stocks':
             s += "- " + i + "\n"
         st.markdown(s)
         sys.exit()
-    else:
-        df_ns=df_ns[df_ns.EXPIRY_DT==expiry]
+    
+    df_ns=df_ns[df_ns.EXPIRY_DT==expiry]
 
     l=list(df_ns.SYMBOL)
     if INSTRUMENT=="OPTIDX":
@@ -320,15 +320,15 @@ elif check_type=='NSE_filter':
             s += "- " + i + "\n"
         st.markdown(s)
         sys.exit()
-    else:
-        df_nf=df_nf[df_nf.EXPIRY_DT==expiry]
+    
+    df_nf=df_nf[df_nf.EXPIRY_DT==expiry]
 
 
 
 
-    today_con_name="CONTRACTS"
-    yest_con_name="CONTRACTS_"+lis[-3:][1].strftime('%d%b').upper()
-    daybef_con_name="CONTRACTS_"+lis[-3:][0].strftime('%d%b').upper()
+    # today_con_name="CONTRACTS"
+    # yest_con_name="CONTRACTS_"+lis[-3:][1].strftime('%d%b').upper()
+    # daybef_con_name="CONTRACTS_"+lis[-3:][0].strftime('%d%b').upper()
 
 
 
