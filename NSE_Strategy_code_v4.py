@@ -214,7 +214,7 @@ df_ns.rename(columns={"CLOSE_y":"EQ_price","CLOSE_x":"CLOSE"},inplace=True)
 
 if st.sidebar.button("Refresh with Latest Data"):
     st.cache_data.clear()
-    st.experimental_rerun()
+    st.rerun()
     
 with st.sidebar.header('Choose your input type'):
     check_type = st.sidebar.radio('Select your input type here:',('NSE_filter','NSE_stocks'))
