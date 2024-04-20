@@ -353,7 +353,7 @@ elif check_type=='NSE_filter':
 
     #print(yest_con_name)
     #Add button **************************************
-    df2=df2.iloc[df2[contracts].apply(lambda x: all(x[i]<x[i+1] for i in range(co)),axis=1)]
+    df2=df2[df2[contracts].apply(lambda x: all(x[i]<x[i+1] for i in range(co)),axis=1)]
 
 
 
