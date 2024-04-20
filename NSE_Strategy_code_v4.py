@@ -30,7 +30,7 @@ e_path="Other_Data"
 def get_df(df):
     #df = pd.read_csv(d_path+'/'+name)
     df.columns = df.columns.str.strip()
-    df = df.applymap(lambda x: x.strip() if type(x)==str else x)
+    df = df.map(lambda x: x.strip() if type(x)==str else x)
     df=df[['TIMESTAMP','INSTRUMENT','SYMBOL', 'EXPIRY_DT', 'STRIKE_PR', 'OPTION_TYP',
            'OPEN', 'HIGH', 'LOW', 'CLOSE', 'OPEN_INT', 'CONTRACTS']]
     df.reset_index(drop=True,inplace=True)
@@ -181,7 +181,7 @@ mtm=copy.deepcopy(mtm1)
 df_nf.drop(['TIMESTAMP'], axis=1,inplace=True)
 lot_size.columns=lot_size.columns.str.strip()
 lot_size=lot_size[['SYMBOL','JAN-23']]
-lot_size = lot_size.applymap(lambda x: x.strip() if type(x)==str else x)
+lot_size = lot_size.map(lambda x: x.strip() if type(x)==str else x)
 for i in lot_size['JAN-23']:
     try:
         int(i)
@@ -352,8 +352,8 @@ elif check_type=='NSE_filter':
 
 
     #print(yest_con_name)
-    #Add butooon **************************************
-    df2=df2[df2[contracts].apply(lambda x: all(x[i]<x[i+1] for i in range(co)),axis=1)]
+    #Add button **************************************
+    df2=df2.iloc[df2[contracts].apply(lambda x: all(x[i]<x[i+1] for i in range(co)),axis=1)]
 
 
 
