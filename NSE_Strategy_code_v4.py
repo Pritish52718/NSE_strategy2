@@ -28,11 +28,22 @@ d_path="Data"
 e_path="Other_Data"
 
 def get_df(df):
-    #df = pd.read_csv(d_path+'/'+name)
+    #df = pd.read_csv(d_path+'/'+name)    
     df.columns = df.columns.str.strip()
     df = df.map(lambda x: x.strip() if type(x)==str else x)
-    df=df[['TIMESTAMP','INSTRUMENT','SYMBOL', 'EXPIRY_DT', 'STRIKE_PR', 'OPTION_TYP',
-           'OPEN', 'HIGH', 'LOW', 'CLOSE', 'OPEN_INT', 'CONTRACTS']]
+    df=df[['TradDt','FinInstrmTp','TckrSymb','XpryDt','StrkPric','OptnTp','OpnPric','HghPric','LwPric','ClsPric',
+           'UndrlygPric','OpnIntrst','NewBrdLotQty','TtlTradgVol']]
+    df.rename(columns={'TradDt':'TIMESTAMP','FinInstrmTp': 'INSTRUMENT', 'TckrSymb': 'SYMBOL', 'XpryDt': 'EXPIRY_DT','StrkPric': 'STRIKE_PR',
+             'OptnTp': 'OPTION_TYP',
+             'OpnPric': 'OPEN',
+             'HghPric': 'HIGH',
+             'LwPric': 'LOW',
+             'ClsPric': 'CLOSE',
+             'OpnIntrst': 'OPEN_INT',
+             'UndrlygPric':'EQ_price',
+            'NewBrdLotQty':'Lot_size',
+            'TtlTradgVol':'CONTRACTS'
+            },inplace=True)
     df.reset_index(drop=True,inplace=True)
 
     return df
@@ -63,7 +74,7 @@ def rename_x(df,filename):
 
 
 
-today_date=datetime.now().strftime("%Y%b%d")
+today_date=datetime.now().strftime("%Y%m%d")
 logging.basicConfig(filename="Log_"+today_date+".log", format='%(asctime)s %(message)s', filemode='w') 
 logger=logging.getLogger() 
 logger.setLevel(logging.INFO) 
@@ -86,16 +97,16 @@ def downld_data():
     check=True
 
     if Start_date=="" or Start_date=="enter_start_date_in_DDMMMYYYY":
-        Start_date=(datetime.now()-timedelta(days=14)).strftime("%Y%b%d")
+        Start_date=(datetime.now()-timedelta(days=14)).strftime("%Y%m%d")
         End_date=today_date
     if End_date=="" or End_date=="enter_start_date_in_DDMMMYYYY":
             End_date=today_date
 
-    daterange = pd.date_range(datetime.strptime(Start_date, "%Y%b%d"),datetime.strptime(End_date, "%Y%b%d"))
+    daterange = pd.date_range(datetime.strptime(Start_date, "%Y%m%d"),datetime.strptime(End_date, "%Y%m%d"))
     lis,skip_dates=[],[]
     #Looping through each date, and downloading the file.
     for single_date in daterange:
-        loop_date=single_date.strftime("%Y-%b-%d")
+        loop_date=single_date.strftime("%Y-%m-%d")
         year,month,date=loop_date.split('-')
         month=month.upper()
         weekday=single_date.weekday()
@@ -103,37 +114,44 @@ def downld_data():
         if weekday not in [5,6]:
             Working_day=Working_day+1
             logger.info("Trying to download File of :"+loop_date)
-            temp_zip_file_url = 'https://archives.nseindia.com/content/historical/DERIVATIVES/'+year+'/'+month+'/fo'+date+month+year+'bhav.csv.zip'
+            temp_zip_file_url = 'https://nsearchives.nseindia.com/content/fo/BhavCopy_NSE_FO_0_0_0_'+year+month+date+'_F_0000.csv.zip'
             logger.info(temp_zip_file_url)
-            #ls,df_ns,df_nf=req(temp_zip_file_url,df_ns,df_nf)
-            #r = requests.post(temp_zip_file_url)
-            try:
-                r = requests.Session().get(temp_zip_file_url,timeout=5)#,verify=False)
-            except:
-                skip_dates.append(loop_date)
-                continue;
-            logger.info(r.status_code)
-            status_code=r.status_code
-            if status_code==200:
-                lis.append(single_date)
-                logger.info("File Available.Downloading")
-                z = zipfile.ZipFile(io.BytesIO(r.content))
-                df = pd.read_csv(z.open(z.namelist()[0]))
-                filename=z.namelist()[0]
-                df=get_df(df)
-                dfns=pd.concat([df,dfns],ignore_index=True,axis=0)
-                if dfnf.empty:
-                    dfnf=copy.deepcopy(df)
-                    first_file=filename
+            headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36'
+        }
+            with requests.Session() as session:
+                session.headers.update(headers)
 
-                else:
+                try:
+                    r = session.get(temp_zip_file_url, timeout=30)
+                    if r.status_code == 200:
+                        lis.append(single_date)
+                        logger.info(f"File Available for {loop_date}. Downloading...")
+                        z = zipfile.ZipFile(io.BytesIO(r.content))
+                        df = pd.read_csv(z.open(z.namelist()[0]))
+                        filename = z.namelist()[0]
+                        df = get_df(df)
+                        dfns = pd.concat([df, dfns], ignore_index=True, axis=0)
 
-                    dfnf=pd.merge(df,dfnf,on=['SYMBOL', 'EXPIRY_DT', 'STRIKE_PR', 'OPTION_TYP'],how='left')
-                    ext=lis[-2].strftime('%d%b').upper()
-                    drop_y(dfnf,ext)
+                        if dfnf.empty:
+                            dfnf = copy.deepcopy(df)
+                            first_file = filename
+                        else:
+                            dfnf = pd.merge(df, dfnf, on=['SYMBOL', 'EXPIRY_DT', 'STRIKE_PR', 'OPTION_TYP'], how='left')
+                            ext = lis[-2].strftime('%d%b').upper()
+                            drop_y(dfnf, ext)
+                    else:
+                        logger.info(f"File not available for {loop_date} (Status Code: {r.status_code}). Skipping.")
+                        skip_dates.append(loop_date)
+                        continue
 
-#     dfnf=dfnf.rename(columns={'LOW':'LOW_'+first_file[2:7],'CONTRACTS':'CONTRACTS_'+first_file[2:7],'OPEN':'OPEN_'+first_file[2:7],
-#                              'HIGH':'HIGH_'+first_file[2:7],'CLOSE':'CLOSE_'+first_file[2:7],'OPEN_INT':'OPEN_INT_'+first_file[2:7]})
+                except requests.exceptions.RequestException as e:
+                    logger.error(f"Error downloading the file for {loop_date}: {e}")
+                    skip_dates.append(loop_date)
+                    continue
+
+    #     dfnf=dfnf.rename(columns={'LOW':'LOW_'+first_file[2:7],'CONTRACTS':'CONTRACTS_'+first_file[2:7],'OPEN':'OPEN_'+first_file[2:7],
+    #                              'HIGH':'HIGH_'+first_file[2:7],'CLOSE':'CLOSE_'+first_file[2:7],'OPEN_INT':'OPEN_INT_'+first_file[2:7]})
 
 
 
@@ -143,19 +161,20 @@ def downld_data():
         new_date=lis[-1]-timedelta(2)
     else:
         new_date=lis[-1]
-    loop1_date=new_date.strftime("%Y-%b-%d")
-    year,month,date=loop1_date.split('-')
-    month=month.upper()
-    temp_zip_file_url = 'https://archives.nseindia.com/content/historical/EQUITIES/'+year+'/'+month+'/cm'+date+month+year+'bhav.csv.zip'
-    logger.info(temp_zip_file_url)
-    r = requests.Session().get(temp_zip_file_url)#,verify=False)
-    #r = requests.post(temp_zip_file_url)
-    logger.info("File with status code: "+str(r.status_code))
-    z = zipfile.ZipFile(io.BytesIO(r.content))
-    mtm = pd.read_csv(z.open(z.namelist()[0]))
-    
+
+    # loop1_date=new_date.strftime("%Y-%b-%d")
+    # year,month,date=loop1_date.split('-')
+    # month=month.upper()
+    # temp_zip_file_url = 'https://archives.nseindia.com/content/historical/EQUITIES/'+year+'/'+month+'/cm'+date+month+year+'bhav.csv.zip'
+    # logger.info(temp_zip_file_url)
+    # r = requests.Session().get(temp_zip_file_url)#,verify=False)
+    # #r = requests.post(temp_zip_file_url)
+    # logger.info("File with status code: "+str(r.status_code))
+    # z = zipfile.ZipFile(io.BytesIO(r.content))
+    # mtm = pd.read_csv(z.open(z.namelist()[0]))
+
     lis.sort()
-    
+
     #print("Number of files downloaded:"+str(No_of_download))
     logger.info("****************************************************************************************") 
     logger.info("No. of files downloaded="+str(No_of_download)) 
@@ -163,32 +182,20 @@ def downld_data():
     logger.info("No. of weekdays in the given time span="+str(Working_day)) 
     logger.info("****************************************************************************************") 
     logging.shutdown()
-    
-    
-    lot_size=pd.read_csv('fo_mktlots.csv')
 
-    return(lis,dfns,dfnf,lot_size,mtm,skip_dates,datetime.now())
+    return(lis,dfns,dfnf,skip_dates,datetime.now())
 
 
 # In[ ]:
 
     
-lis,dfns,dfnf,lot_size,mtm1,skip_dates,time_dt=downld_data()
+lis,dfns,dfnf,skip_dates,time_dt=downld_data()
 df_nf=copy.deepcopy(dfnf)
 df_ns=copy.deepcopy(dfns)
-mtm=copy.deepcopy(mtm1)
+# mtm=copy.deepcopy(mtm1)
 
 df_nf.drop(['TIMESTAMP'], axis=1,inplace=True)
-lot_size.columns=lot_size.columns.str.strip()
-lot_size=lot_size[['SYMBOL','JAN-23']]
-lot_size = lot_size.map(lambda x: x.strip() if type(x)==str else x)
-for i in lot_size['JAN-23']:
-    try:
-        int(i)
-    except ValueError:
-        #print(i)
-        lot_size.drop(lot_size[lot_size['JAN-23']==i].index, inplace = True)
-lot_size['JAN-23']=lot_size['JAN-23'].astype(int)
+
 
 
 
@@ -201,15 +208,15 @@ lot_size['JAN-23']=lot_size['JAN-23'].astype(int)
 
 #df_nf,df_ns,lot_size=read_data(filename,Data_names,lot_size)
 
-mtm=mtm[mtm.SERIES=='EQ']
+# mtm=mtm[mtm.SERIES=='EQ']
 
 
 
-df_nf=pd.merge(df_nf,mtm[['SYMBOL','CLOSE']],on="SYMBOL",how="left")
-df_nf.rename(columns={"CLOSE_y":"EQ_price","CLOSE_x":"CLOSE"},inplace=True)
+# df_nf=pd.merge(df_nf,mtm[['SYMBOL','CLOSE']],on="SYMBOL",how="left")
+# df_nf.rename(columns={"CLOSE_y":"EQ_price","CLOSE_x":"CLOSE"},inplace=True)
 
-df_ns=pd.merge(df_ns,mtm[['SYMBOL','CLOSE']],on="SYMBOL",how="left")
-df_ns.rename(columns={"CLOSE_y":"EQ_price","CLOSE_x":"CLOSE"},inplace=True)
+# df_ns=pd.merge(df_ns,mtm[['SYMBOL','CLOSE']],on="SYMBOL",how="left")
+# df_ns.rename(columns={"CLOSE_y":"EQ_price","CLOSE_x":"CLOSE"},inplace=True)
 
 
 if st.sidebar.button("Refresh with Latest Data"):
@@ -230,17 +237,21 @@ st.markdown("Data till: "+lis[-1].strftime("%d-%b-%Y"))
 if check_type=='NSE_stocks':
     #st.markdown("Data till: "+lis[-1].strftime("%d-%b-%Y"))
     col1,col2,col3,col4,col5=st.columns([2,1.5,1.5,1.5,1.5])
-    INSTRUMENT=col1.radio('Select Stock option or Index option',("OPTSTK","OPTIDX"))
+    INSTRUMENTS=col1.radio('Select Stock option or Index option',("Stock Options","Index Options"))
+    if INSTRUMENTS=="Stock Options":
+        INSTRUMENT='STO'
+    elif INSTRUMENTS=="Index Options":
+        INSTRUMENT='IDO'
     exp_dates=sorted(pd.to_datetime(df_ns[df_ns.INSTRUMENT==INSTRUMENT].EXPIRY_DT.unique()))
     exp_date=exp_dates[0]
     
     expiry=col5.date_input("Enter expiry date",exp_date)
-    expiry=expiry.strftime("%d-%b-%Y")
+    expiry=expiry.strftime("%Y-%m-%d")
 
     df_ns=df_ns[df_ns.INSTRUMENT==INSTRUMENT]
     if expiry not in df_ns.EXPIRY_DT.values:
         st.write('Please select correct expiry among: ')
-        lst_exp=[i.strftime("%d-%b-%Y") for i in exp_dates if i.month==datetime.today().month ]
+        lst_exp=[i.strftime("%Y-%m-%d") for i in exp_dates if i.month==datetime.today().month ]
         s = ''
         for i in lst_exp:
             s += "- " + i + "\n"
@@ -250,7 +261,7 @@ if check_type=='NSE_stocks':
     df_ns=df_ns[df_ns.EXPIRY_DT==expiry]
 
     l=list(df_ns.SYMBOL)
-    if INSTRUMENT=="OPTIDX":
+    if INSTRUMENT=="IDO":
         option = col3.selectbox('Select an index',['BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'NIFTY'])
     else:        
         option = col3.selectbox('Select a stock',['AARTIIND', 'ABB', 'ABBOTINDIA', 'ABCAPITAL', 'ABFRL', 'ACC', 'ADANIENT', 'ADANIPORTS', 'ALKEM', 'AMARAJABAT', 'AMBUJACEM', 'APOLLOHOSP', 'APOLLOTYRE', 'ASHOKLEY', 'ASIANPAINT', 'ASTRAL', 'ATUL', 'AUBANK', 'AUROPHARMA', 'AXISBANK', 'BAJAJ-AUTO', 'BAJAJFINSV', 'BAJFINANCE', 'BALKRISIND', 'BALRAMCHIN', 'BANDHANBNK', 'BANKBARODA', 'BATAINDIA', 'BEL', 'BERGEPAINT', 'BHARATFORG', 'BHARTIARTL', 'BHEL', 'BIOCON', 'BOSCHLTD', 'BPCL', 'BRITANNIA', 'BSOFT', 'CANBK', 'CANFINHOME', 'CHAMBLFERT', 'CHOLAFIN', 'CIPLA', 'COALINDIA', 'COFORGE', 'COLPAL', 'CONCOR', 'COROMANDEL', 'CROMPTON', 'CUB', 'CUMMINSIND', 'DABUR', 'DALBHARAT', 'DEEPAKNTR', 'DELTACORP', 'DIVISLAB', 'DIXON', 'DLF', 'DRREDDY', 'EICHERMOT', 'ESCORTS', 'EXIDEIND', 'FEDERALBNK', 'FSL', 'GAIL', 'GLENMARK', 'GMRINFRA', 'GNFC', 'GODREJCP', 'GODREJPROP', 'GRANULES', 'GRASIM', 'GSPL', 'GUJGASLTD', 'HAL', 'HAVELLS', 'HCLTECH', 'HDFC', 'HDFCAMC', 'HDFCBANK', 'HDFCLIFE', 'HEROMOTOCO', 'HINDALCO', 'HINDCOPPER', 'HINDPETRO', 'HINDUNILVR', 'HONAUT', 'IBULHSGFIN', 'ICICIBANK', 'ICICIGI', 'ICICIPRULI', 'IDEA', 'IDFC', 'IDFCFIRSTB', 'IEX', 'IGL', 'INDHOTEL', 'INDIACEM', 'INDIAMART', 'INDIGO', 'INDUSINDBK', 'INDUSTOWER', 'INFY', 'INTELLECT', 'IOC', 'IPCALAB', 'IRCTC', 'ITC', 'JINDALSTEL', 'JKCEMENT', 'JSWSTEEL', 'JUBLFOOD', 'KOTAKBANK', 'L&TFH', 'LALPATHLAB', 'LAURUSLABS', 'LICHSGFIN', 'LT', 'LTI', 'LTTS', 'LUPIN', 'M&M', 'M&MFIN', 'MANAPPURAM', 'MARICO', 'MARUTI', 'MCDOWELL-N', 'MCX', 'METROPOLIS', 'MFSL', 'MGL', 'MINDTREE', 'MOTHERSON', 'MPHASIS', 'MRF', 'MUTHOOTFIN', 'NATIONALUM', 'NAUKRI', 'NAVINFLUOR', 'NESTLEIND', 'NMDC', 'NTPC', 'OBEROIRLTY', 'OFSS', 'ONGC', 'PAGEIND', 'PEL', 'PERSISTENT', 'PETRONET', 'PFC', 'PIDILITIND', 'PIIND', 'PNB', 'POLYCAB', 'POWERGRID', 'PVR', 'RAIN', 'RAMCOCEM', 'RBLBANK', 'RECLTD', 'RELIANCE', 'SAIL', 'SBICARD', 'SBILIFE', 'SBIN', 'SHREECEM', 'SIEMENS', 'SRF', 'SRTRANSFIN', 'SUNPHARMA', 'SUNTV', 'SYNGENE', 'TATACHEM', 'TATACOMM', 'TATACONSUM', 'TATAMOTORS', 'TATAPOWER', 'TATASTEEL', 'TCS', 'TECHM', 'TITAN', 'TORNTPHARM', 'TORNTPOWER', 'TRENT', 'TVSMOTOR', 'UBL', 'ULTRACEMCO', 'UPL', 'VEDL', 'VOLTAS', 'WHIRLPOOL', 'WIPRO', 'ZEEL', 'ZYDUSLIFE'])
@@ -290,9 +301,14 @@ elif check_type=='NSE_filter':
     col1,col2,col3,col4=st.columns([2,2,2,2])
 
 
-    INSTRUMENT=col1.radio('Select Stock option or Index option',("OPTSTK","OPTIDX"))
+    INSTRUMENTS=col1.radio('Select Stock option or Index option',("Stock Options","Index Options"))
+    if INSTRUMENTS=="Stock Options":
+        INSTRUMENT='STO'
+    elif INSTRUMENTS=="Index Options":
+        INSTRUMENT='IDO'
     exp_dates=sorted(pd.to_datetime(df_nf[df_nf.INSTRUMENT==INSTRUMENT].EXPIRY_DT.unique()))
     exp_date=exp_dates[0]
+    
 
     # co=int(col4.radio('1-Day or 2-Days decreasing Contracts',(2,1),key='radio_option'))
     co=int(col4.selectbox('1-5 Days decreasing Contracts',(5,4,3,2,1),index=3))
@@ -308,13 +324,15 @@ elif check_type=='NSE_filter':
     contr=col2.text_input('Minumum contracts',200)
     op_int=buff.text_input('Minimum OPEN INTEREST',100000)
     expiry=col3.date_input("Enter expiry date",exp_date)
-    expiry=expiry.strftime("%d-%b-%Y")
+    expiry=expiry.strftime("%Y-%m-%d")
+    print(expiry)
 
 
     df_nf=df_nf[df_nf.INSTRUMENT==INSTRUMENT]
+    print(df_nf.EXPIRY_DT.unique())
     if expiry not in df_nf.EXPIRY_DT.values:
         st.write('Please select correct expiry among: ')
-        lst_exp=[i.strftime("%d-%b-%Y") for i in exp_dates if i.month==datetime.today().month ]
+        lst_exp=[i.strftime("%Y-%m-%d") for i in exp_dates if i.month==datetime.today().month ]
         s = ''
         for i in lst_exp:
             s += "- " + i + "\n"
@@ -325,24 +343,11 @@ elif check_type=='NSE_filter':
 
 
 
-
-    # today_con_name="CONTRACTS"
-    # yest_con_name="CONTRACTS_"+lis[-3:][1].strftime('%d%b').upper()
-    # daybef_con_name="CONTRACTS_"+lis[-3:][0].strftime('%d%b').upper()
-
-
-
-    #df_nf=df_nf.rename(columns={today_con_name:"CONTRACTS",'LOW_'+exten:"LOW"})
-#     df_nf=df_nf.rename(columns={today_con_name:"CONTRACTS",'LOW_'+exten:"LOW",'OPEN_'+exten:'OPEN',
-#                                  'HIGH_'+exten:'HIGH','CLOSE_'+exten:'CLOSE','OPEN_INT_'+exten:'OPEN_INT'})
-
-
-
     lows=df_nf.columns[df_nf.columns.str.contains('LOW')]
     contracts=df_nf.columns[df_nf.columns.str.contains('CONTRACTS')]
     df_nf=df_nf[df_nf.LOW==df_nf[lows].min(axis=1)]
 
-    if INSTRUMENT=='OPTSTK':
+    if INSTRUMENT=='STO':
         df_ce=df_nf[(df_nf.OPTION_TYP=='CE')]#&(df_nf.STRIKE_PR>df_nf.EQ_price)]
         df_pe=df_nf[(df_nf.OPTION_TYP=='PE')]#&(df_nf.STRIKE_PR<df_nf.EQ_price)]
         df2=pd.concat([df_ce, df_pe], ignore_index=True, axis=0)
@@ -353,13 +358,13 @@ elif check_type=='NSE_filter':
 
     #print(yest_con_name)
     #Add button **************************************
-    df2=df2[df2.loc[:,contracts].apply(lambda x: all(x[i]<x[i+1] for i in range(co)),axis=1)]
+    df4=df2[df2.loc[:,contracts].apply(lambda x: all(x[i]<x[i+1] for i in range(co)),axis=1)]
 
 
 
-    df4=df2.merge(lot_size,on='SYMBOL',how="left")
-    df4.rename(columns={'JAN-23':'Lot_size'},inplace=True)
-    #df4.Lot_size=df4.Lot_size.astype('int64')
+#     df4=df2.merge(lot_size,on='SYMBOL',how="left")
+#     df4.rename(columns={'JAN-23':'Lot_size'},inplace=True)
+    df4.Lot_size=df4.Lot_size.astype('int64')
     df4['Investment']=df4['HIGH']*df4['Lot_size']
 
 
