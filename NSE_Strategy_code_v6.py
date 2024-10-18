@@ -114,16 +114,23 @@ def downld_data():
         if weekday not in [5,6]:
             Working_day=Working_day+1
             logger.info("Trying to download File of :"+loop_date)
-            temp_zip_file_url = 'https://nsearchives.nseindia.com/content/fo/BhavCopy_NSE_FO_0_0_0_'+year+month+date+'_F_0000.csv.zip'
+            temp_zip_file_url = "https://www.samco.in/bse_nse_mcx/getBhavcopy"
             logger.info(temp_zip_file_url)
             headers = {
+                'Content-Type': 'application/x-www-form-urlencoded',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.121 Safari/537.36'
         }
+            payload = {
+                    'start_date': '2024-10-14',
+                    'end_date': '2024-10-16',
+                    'show_or_down': '2',
+                    'bhavcopy_data[]': 'NSEFO'  # Handle array-like parameter correctly
+                }
             with requests.Session() as session:
                 session.headers.update(headers)
 
                 try:
-                    r = session.get(temp_zip_file_url, timeout=30)
+                    r = session.post(temp_zip_file_url,data=payload, timeout=30)
                     if r.status_code == 200:
                         lis.append(single_date)
                         logger.info(f"File Available for {loop_date}. Downloading...")
